@@ -21,7 +21,7 @@
     </main>
 
     <footer class="site-footer">
-        <div class="container inner">Todoアプリ - Laravel ハンズオン</div>
+        <div class="container inner">高田　丈夫</div>
     </footer>
 </body>
 </html>
