@@ -9,7 +9,7 @@
 <body>
     <header class="site-header">
         <div class="container inner">
-            <a href="/tasks">Todoアプリ</a>
+            <a href="{{ route('tasks.index') }}">Todoアプリ</a>
             <span class="sub">Laravel ハンズオン</span>
         </div>
     </header>
