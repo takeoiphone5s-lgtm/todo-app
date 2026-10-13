@@ -183,15 +183,140 @@ php artisan view:clear
 
 ## モデル・DB まわり
 
-### `Class "App\Models\Task" not found`
+### `Class "Task" not found` と出る（名前空間が付いていない）
 
-| 確認すること |
-| --- |
-| ファイルが `app/Models/Task.php` にあるか |
-| ファイルの先頭に `namespace App\Models;` があるか |
-| コントローラの先頭に `use App\Models\Task;` があるか |
+**`app/Models/Task.php` はちゃんとあるのに、Tinker でこう言われるケースです。**
+主に `php artisan tinker` の中で起きます。
 
-それでもダメなら `composer dump-autoload`。
+```
+>>> Task::create(['name' => '牛乳を買う', 'status' => false]);
+  Class "Task" not found.
+```
+
+#### 原因
+
+PHP は「クラス名 → ファイルの場所」の対応表
+（`vendor/composer/autoload_classmap.php`）を使ってファイルを探します。
+この表は **`composer install` を実行した時点のファイル一覧** から作られます。
+
+第 0 章で `composer install` した時点では `Task.php` はまだ存在しないので、
+**第 3 章で作った `Task` は、この表に載っていません。**
+
+- アプリ本体（コントローラ・シーダー・テスト）は `App\Models\Task` と
+  **フルネーム** で書くので、表になくてもフォルダ構成から場所を推測して読み込めます
+- ところが **Tinker の「短い名前で呼べる機能」は、この表だけを見ています**
+
+だから「テストやブラウザでは動くのに、Tinker の `Task::` だけ落ちる」という状態になります。
+
+#### 対処
+
+```powershell
+composer dump-autoload
+```
+
+これで表が作り直されます。次に `php artisan tinker` を起動すると
+
+```
+[!] Aliasing 'Task' to 'App\Models\Task' for this Tinker session.
+```
+
+と表示され、`Task::count()` のような短い書き方が使えるようになります。
+
+> **この PC は電源を切ると中身が消えるので、授業のたびに 1 回必要です。**
+> 第 3 章の Step 3-3 に手順があります。
+
+#### 急いでいるときの回避策
+
+対応表を直さずに、フルネームで打っても動きます。
+
+```php
+App\Models\Task::create(['name' => '牛乳を買う', 'status' => false]);
+```
+
+> なお 2 回目以降の授業で、**`Task.php` がある状態でクローンして `composer install` した人は、
+> 最初からこの表に `Task` が載っているので、このエラーが出ません。**
+> 同じ教室で「出る人」と「出ない人」が分かれるのはこれが理由です。
+
+### `Class "App\Models\Task" not found` と出る
+
+**このエラーは「Task モデルのファイルを PHP が見つけられない」という意味** です。
+よくある原因を、起きやすい順に並べました。上から順に確認してください。
+
+#### 原因 1：まだ第 3 章に進んでいない（一番多い）
+
+`Task` モデルを作るのは **第 3 章** です。
+第 2 章の時点で `php artisan test`（フィルタなし）を実行すると、
+第 3 章以降のテストも一緒に走るので、このエラーがずらっと出ます。
+
+**この段階では正常です。** 第 2 章の確認は、章を指定して実行してください。
+
+```powershell
+php artisan test --filter=ch02
+```
+
+#### 原因 2：ファイルの置き場所が違う
+
+正しい場所は **`app/Models/Task.php`** です。次のコマンドで確認できます。
+
+```powershell
+Get-ChildItem app\Models
+```
+
+`Task.php` が出てこない場合、`app/Task.php` に作ってしまっているか、
+そもそも作れていません。`php artisan make:model Task` を実行し直してください
+（Laravel 7 以前の解説記事は `app/` 直下に作らせるので、見比べるときは注意）。
+
+#### 原因 3：拡張子が `.php` になっていない（Windows で頻発）
+
+Windows は初期設定で **拡張子を隠します**。
+メモ帳でモデルを作ると、`Task.php` のつもりが **`Task.php.txt`** になっていることがあります。
+
+```powershell
+Get-ChildItem app\Models -Force | Select-Object Name, Length
+```
+
+`Task.php.txt` のような名前が出たら、これが原因です。
+エクスプローラーの「表示」→「ファイル名拡張子」にチェックを入れてから直してください。
+
+> そもそも **`php artisan make:model Task` で作れば、この事故は起きません。**
+> 手でファイルを作らないのが一番の対策です。
+
+#### 原因 4：`namespace` が間違っている
+
+ファイルの先頭は、必ずこの 2 行です。
+
+```php
+<?php
+
+namespace App\Models;
+```
+
+`App\Model`（単数形）や `app\Models`（小文字）になっていると見つかりません。
+`namespace` の行を書き忘れた場合も同じです。
+
+#### 原因 5：`use` 文を書き忘れている
+
+コントローラやシーダーの先頭に、次の行が必要です。
+
+```php
+use App\Models\Task;
+```
+
+> **なお `php artisan tinker` の中では `use` 文は不要**（`Task::count()` がそのまま動く）です。
+> tinker では動くのにテストで落ちる場合は、この `use` 文の書き忘れを疑ってください。
+
+#### 原因 6：クラス名とファイル名が合っていない
+
+`app/Models/Task.php` の中身は `class Task extends Model` でなければいけません。
+`class Tasks`（複数形）や `class task`（小文字）になっていないか確認してください。
+
+#### それでも直らないとき
+
+クラスの索引（オートロード情報）を作り直します。
+
+```powershell
+composer dump-autoload
+```
 
 ### `Table 'todo_app.tasks' doesn't exist`
 

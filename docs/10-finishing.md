@@ -477,7 +477,7 @@ php artisan test
 ```
 
 ```
-Tests:  14 passed
+Tests:  15 passed
 ```
 
 **全部緑になったら完成です。おつかれさまでした！** 🎉

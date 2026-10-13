@@ -88,9 +88,55 @@ class Task extends Model
 
 ---
 
-## Step 3-3　Tinker で動かしてみる
+## Step 3-3　クラスの索引を作り直す（これを忘れると次で詰まります）
 
-```bash
+新しくクラスを作ったら、次のコマンドを **1 回だけ** 実行してください。
+
+```powershell
+composer dump-autoload
+```
+
+### なぜ必要なのか
+
+PHP は「クラス名 → ファイルの場所」の対応表（オートロード情報）を頼りにファイルを探します。
+この対応表は `composer install` した時点のファイル一覧から作られるので、
+**あとから `Task.php` を作っても、対応表には載っていません。**
+
+アプリ本体（コントローラやテスト）は `App\Models\Task` という **フルネーム** で書くので、
+対応表になくてもフォルダ構成から場所を推測して読み込めます。
+
+ところが **Tinker の「短い名前で呼べる機能」はこの対応表だけを見ています。**
+そのため、`composer dump-autoload` をしないまま次の Step で
+
+```php
+Task::create(['name' => '牛乳を買う', 'status' => false]);
+```
+
+と打つと、ファイルはちゃんとあるのに
+
+```
+Class "Task" not found.
+```
+
+と言われます。`composer dump-autoload` を実行すると対応表が作り直され、
+Tinker の起動時に
+
+```
+[!] Aliasing 'Task' to 'App\Models\Task' for this Tinker session.
+```
+
+と表示されて、短い名前が使えるようになります。
+
+> **エラーメッセージの見分け方**
+> `Class "Task" not found`（**名前空間が付いていない**）＝ この対応表の問題。
+> `Class "App\Models\Task" not found`（**名前空間が付いている**）＝ ファイルそのものが見つかっていない。
+> 後者の場合は [困ったときは](troubleshooting.md#class-appmodelstask-not-found-と出る) を見てください。
+
+---
+
+## Step 3-4　Tinker で動かしてみる
+
+```powershell
 php artisan tinker
 ```
 
@@ -128,7 +174,7 @@ exit
 
 ---
 
-## Step 3-4　シーダーでダミーデータを用意する
+## Step 3-5　シーダーでダミーデータを用意する
 
 毎回 Tinker で手入力するのは大変なので、
 **ダミーデータを一発で流し込む仕組み（シーダー）** を作ります。
@@ -221,6 +267,19 @@ exit
 
 phpMyAdmin の `tasks` テーブルにも 5 件入っていることを確認してください。
 
+### テストを実行する
+
+```powershell
+php artisan test --filter=ch03
+```
+
+```
+✓ ch03 Taskモデルで登録できる
+```
+
+ここで `Class "App\Models\Task" not found` と出る場合は、
+モデルのファイルが正しい場所にありません。[困ったときは](troubleshooting.md#class-appmodelstask-not-found-と出る) を見てください。
+
 ---
 
 ## 演習
@@ -246,8 +305,10 @@ Task::where('status', false)->get();
 
 | 症状 | 原因 |
 | --- | --- |
-| `Class "App\Models\Task" not found` | ファイル名が `Task.php` か、`namespace App\Models;` があるか確認 |
+| **`Class "Task" not found`**（名前空間なし） | Step 3-3 の `composer dump-autoload` がまだ。Tinker の短い名前が使えていない |
+| `Class "App\Models\Task" not found`（名前空間あり） | ファイル名が `Task.php` か、`namespace App\Models;` があるか確認 |
 | `create()` したのに name が空で保存される | `$fillable` に `'name'` を書き忘れている |
 | `Table 'todo_app.tasks' doesn't exist` | 第 2 章の `php artisan migrate` がまだ |
+| Tinker では動くのにテストだと落ちる | ファイルの先頭に `use App\Models\Task;` を書き忘れている |
 
 ➡ 次は [第 4 章 一覧表示（Read）](04-controller-index.md)

@@ -49,7 +49,7 @@
 | `php artisan view:clear` | Blade の変更が効かないとき |
 | `php artisan route:clear` | ルートの変更が効かないとき |
 | `php artisan optimize:clear` | 上を全部まとめて |
-| `composer dump-autoload` | 新しいクラスが `not found` になるとき |
+| `composer dump-autoload` | 新しいクラスが `not found` になるとき。**`make:model` の後は 1 回実行する**（Tinker で短い名前を使うために必要） |
 
 ---
 

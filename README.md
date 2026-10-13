@@ -43,15 +43,9 @@
 XAMPP Control Panel を開き、**MySQL の行の「Start」** を押します。
 「Running」と緑色になれば OK です。（Apache は使いません）
 
-### 2. リポジトリをクローンする
-
-```powershell
-cd $HOME\Documents
-git clone <配布されたリポジトリのURL> todo-app
-cd todo-app
-```
-
 **これ以降のコマンドは、すべて `todo-app` フォルダの中で実行します。**
+
+VSCodeで統合ターミナルを開く
 
 ### 3. ライブラリをインストールする（3〜5 分）
 
@@ -98,23 +92,6 @@ php artisan serve
 > artisan コマンドを打ちたいときは、**別のターミナルをもう 1 つ開いて** そちらで実行してください。
 
 ---
-
-### まとめてコピペする用（2 回目以降の人向け）
-
-XAMPP で MySQL を起動したあと、以下をターミナルに貼り付ければ 7 まで一気に進みます。
-`<配布されたリポジトリのURL>` の部分だけ書き換えてください。
-
-```powershell
-cd $HOME\Documents
-git clone <配布されたリポジトリのURL> todo-app
-cd todo-app
-composer install
-Copy-Item .env.example .env
-php artisan key:generate
-C:\xampp\mysql\bin\mysql.exe -u root -e "CREATE DATABASE IF NOT EXISTS todo_app DEFAULT CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;"
-php artisan migrate
-php artisan serve
-```
 
 うまくいかないときは [docs/troubleshooting.md](docs/troubleshooting.md) を見てください。
 
@@ -192,7 +169,7 @@ php artisan test
 
 - **最初はほとんど失敗します。それが正常です。**（まだ何も作っていないので）
 - 章を進めるごとに緑（✓）が増えていきます
-- 全 14 件が緑になったらゴールです
+- 全 15 件が緑になったらゴールです
 
 特定の章だけ確認したいとき：
 

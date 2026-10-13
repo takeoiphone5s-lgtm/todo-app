@@ -4,6 +4,8 @@ namespace Tests\Feature;
 
 use App\Models\Task;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 use Tests\TestCase;
 
 /**
@@ -20,13 +22,44 @@ class TodoAppTest extends TestCase
 {
     use RefreshDatabase;
 
-    /** 第2章：tasks テーブルに必要なカラムがある */
+    /**
+     * 第2章：tasks テーブルが設計どおり作られている
+     *
+     * ※ この章ではまだ Task モデルを作っていないので、
+     *    モデルを使わずにテーブルの構造だけを確認している。
+     */
     public function test_ch02_tasksテーブルが作られている()
     {
-        $task = Task::create(['name' => 'テスト', 'status' => false]);
+        $this->assertTrue(
+            Schema::hasTable('tasks'),
+            'tasks テーブルがありません（マイグレーションを書いて php artisan migrate を実行しましたか？）'
+        );
 
-        $this->assertDatabaseHas('tasks', ['name' => 'テスト', 'status' => false]);
+        foreach (['id', 'name', 'status', 'created_at', 'updated_at'] as $column) {
+            $this->assertTrue(
+                Schema::hasColumn('tasks', $column),
+                "tasks テーブルに {$column} カラムがありません"
+            );
+        }
+
+        // status の初期値が false（0）になっているか
+        DB::table('tasks')->insert(['name' => 'テスト']);
+
+        $this->assertSame(
+            0,
+            (int) DB::table('tasks')->where('name', 'テスト')->value('status'),
+            'status の初期値が false になっていません（->default(false) を書きましたか？）'
+        );
+    }
+
+    /** 第3章：Task モデルから登録・取得できる */
+    public function test_ch03_Taskモデルで登録できる()
+    {
+        $task = Task::create(['name' => '牛乳を買う', 'status' => false]);
+
+        $this->assertDatabaseHas('tasks', ['name' => '牛乳を買う', 'status' => false]);
         $this->assertNotNull($task->created_at, 'created_at が保存されていません（timestamps() を書きましたか？）');
+        $this->assertSame(1, Task::count());
     }
 
     /** 第4章：一覧に未完了タスクが表示される */

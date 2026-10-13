@@ -5,7 +5,7 @@
 ## この章のゴール
 
 **アプリの動きは 1 ミリも変えずに**、コードだけを型安全に書き直す。
-最後まで `php artisan test` が 14 件緑のままであること。
+最後まで `php artisan test` が 15 件緑のままであること。
 
 ## この章で学ぶこと
 
@@ -34,7 +34,7 @@ php artisan test
 ```
 
 ```
-Tests:  14 passed
+Tests:  15 passed
 ```
 
 ここが緑でないまま書き換えると、「元から壊れていたのか、いま壊したのか」が分からなくなります。
@@ -81,7 +81,7 @@ use Illuminate\View\View;
 php artisan test
 ```
 
-14 件緑のままなら OK です。
+15 件緑のままなら OK です。
 
 ### 何が嬉しいのか
 
@@ -252,7 +252,7 @@ Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])
 php artisan test
 ```
 
-ここでも 14 件緑のはずです。**動きを変えていない証拠** です。
+ここでも 15 件緑のはずです。**動きを変えていない証拠** です。
 
 ---
 
@@ -479,7 +479,7 @@ php artisan test
 ```
 
 ```
-Tests:  14 passed
+Tests:  15 passed
 ```
 
 **1 件も落ちずに、コードだけが変わりました。**
