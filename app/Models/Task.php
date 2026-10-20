@@ -23,4 +23,9 @@ class Task extends Model
     protected $casts = [
         'status' => 'boolean',
     ];
+    
+    public static function deleteCompleted()
+{
+    return static::where('status', true)->delete();
+}
 }

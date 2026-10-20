@@ -4,6 +4,8 @@
 
 @section('content')
     <h1 class="page-title">今日は何をする？</h1>
+    <p class="muted">登録件数:{{ $tasks->count() }} 件</p>
+    
 
     {{-- 追加フォーム --}}
     <div class="card">
@@ -20,6 +22,9 @@
     </div>
 
     {{-- 未完了タスク一覧 --}}
+    @if ($tasks->isEmpty())
+        <p class="empty">未完了のタスクはありません。</p>
+    @else
     <table>
         <thead>
             <tr>
@@ -35,20 +40,55 @@
                     <td>{{ $task->name }}</td>
                     <td class="muted">{{ $task->created_at->format('Y/m/d H:i') }}</td>
                     <td class="actions">
+                        
                         <form action="{{ route('tasks.complete', $task->id) }}" method="post">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn-success btn-sm">完了</button>
                         </form>
-                        <form action="{{ route('tasks.undo', $task->id) }}" method="post">
+
+                        <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-accent btn-sm">編集</a>
+
+                        <form action="{{ route('tasks.destroy', $task->id) }}" method="post"
+                              onsubmit="return confirm('『{{ $task->name }}』を削除しますか？');">
                             @csrf
-                            @method('PATCH')
-                            <button type="submit" class="btn-success btn-sm">未完了に戻る</button>
+                            @method('DELETE')
+                            <button type="submit" class="btn-danger btn-sm">削除</button>
                         </form>
+                        
                     </td>
+                    
                 </tr>
                
             @endforeach
         </tbody>
     </table>
+     @endif
+
+{{-- 完了済みタスク一覧 --}}
+    @if ($doneTasks->isNotEmpty())
+        <h2 class="page-title" style="margin-top: 48px;">完了したタスク</h2>
+        <table>
+            <tbody>
+                @foreach ($doneTasks as $task)
+                    <tr>
+                        <td class="done">{{ $task->name }}</td>
+                        <td class="actions">
+                            <form action="{{ route('tasks.undo', $task->id) }}" method="post">
+                            @csrf
+                            @method('PATCH')
+                            <button type="submit" class="btn-success btn-sm">未完了に戻る</button>
+                        </form>
+                            <form action="{{ route('tasks.destroy', $task->id) }}" method="post"
+                                  onsubmit="return confirm('本当に削除しますか？');">
+                                @csrf
+                                @method('DELETE')
+                                <button type="submit" class="btn-danger btn-sm">削除</button>
+                            </form>
+                        </td>
+                    </tr>
+                @endforeach
+            </tbody>
+        </table>
+    @endif
 @endsection

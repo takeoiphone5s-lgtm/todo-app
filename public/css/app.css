@@ -181,6 +181,15 @@ button:hover,
   color: #065f46;
 }
 
+.alert-danger{
+  padding: 12px 16px;
+  margin-bottom: 24px;
+  border-radius: var(--radius);
+  background: #ff0000;
+  border: 1px solid #e76e6e;
+  color: #5f0606;
+}
+
 /* ---------- 一覧テーブル ---------- */
 
 table {
