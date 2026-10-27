@@ -14,10 +14,10 @@ Route::get('/', function () {
 });
 
 
-Route::patch('/tasks/{id}/complete', [TaskController::class, 'complete'])
+Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])
     ->name('tasks.complete');
 
-Route::patch('/tasks/{id}/undo', [TaskController::class, 'undo'])->name('tasks.undo');
+Route::patch('/tasks/{task}/undo', [TaskController::class, 'undo'])->name('tasks.undo');
 
 Route::resource('tasks', TaskController::class)
     ->only(['index','store','edit', 'update','destroy']);

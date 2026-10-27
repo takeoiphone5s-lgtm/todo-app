@@ -6,6 +6,7 @@
     <h1 class="page-title">タスクを編集する</h1>
 
     <div class="card">
+        <P>登録日時 {{$task->created_at}}<P><P>最終更新日時 {{$task->updated_at}}<P>
         <form action="{{ route('tasks.update', $task->id) }}" method="post">
             @csrf
             @method('PUT')

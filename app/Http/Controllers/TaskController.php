@@ -1,9 +1,13 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Http\Controllers;
 
 use App\Models\Task;  
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
+use Illuminate\View\View;
 
 class TaskController extends Controller
 {
@@ -20,7 +24,7 @@ class TaskController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function index()
+    public function index(): View
     {
         $tasks = Task::where('status', false)
             ->orderBy('created_at', 'desc')
@@ -48,7 +52,7 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request)
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate($this->rules, $this->messages);
 
@@ -80,7 +84,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id)
+    public function edit($id): View
     {
          $task = Task::findOrFail($id);
 
@@ -94,7 +98,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request, $id): RedirectResponse
     {
          $validated = $request->validate($this->rules, $this->messages);
         $task = Task::findOrFail($id);
@@ -112,7 +116,7 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id)
+    public function destroy($id): RedirectResponse
     {
         $task = Task::findOrFail($id);
         $task->delete();
@@ -122,7 +126,7 @@ class TaskController extends Controller
         ->with('message2', 'タスクを削除しました。');
     }
 
-    public function complete($id)
+    public function complete($id): RedirectResponse
     {
         $task = Task::find($id);
         $task->status = true;
