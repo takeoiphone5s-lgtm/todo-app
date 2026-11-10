@@ -4,6 +4,10 @@
 
 @section('content')
     <h1 class="page-title">今日は何をする？</h1>
+    <form action="{{ route('tasks.index') }}" method="get">
+    <input type="text" name="keyword" value="{{ request('keyword') }}">
+    <button type="submit">検索</button>
+</form>
     <p class="muted">登録件数:{{ $tasks->count() }} 件</p>
     
 

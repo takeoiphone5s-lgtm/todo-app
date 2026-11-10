@@ -20,11 +20,13 @@
             <div class="form-actions">
                 <button type="submit" class="btn-accent">更新する</button>
                 <a href="{{ route('tasks.index') }}" class="btn-link">一覧に戻る</a>
+                
                 <form action="{{ route('tasks.complete', $task->id) }}" method="post">
                             @csrf
                             @method('PATCH')
                             <button type="submit" class="btn-success btn-sm">完了</button>
-                        </form>
+                </form>
+                
             </div>
         </form>
     </div>

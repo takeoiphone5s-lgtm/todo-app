@@ -5,20 +5,13 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Task;  
-use Illuminate\Http\Request;
+use App\Http\Requests\TaskRequest;  
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class TaskController extends Controller
 {
-    private array $rules = [
-        'name' => 'required|max:100',
-    ];
-
-    private array $messages = [
-        'name.required' => 'タスク名を入力してください。',
-        'name.max'      => 'タスク名は100文字以内で入力してください。',
-    ];
+    
     /**
      * Display a listing of the resource.
      *
@@ -26,6 +19,7 @@ class TaskController extends Controller
      */
     public function index(): View
     {
+
         $tasks = Task::where('status', false)
             ->orderBy('created_at', 'desc')
             ->get();
@@ -35,6 +29,7 @@ class TaskController extends Controller
             ->get();
 
         return view('tasks.index', compact('tasks', 'doneTasks'));
+        
     }
     /**
      * Show the form for creating a new resource.
@@ -52,19 +47,16 @@ class TaskController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\Response
      */
-    public function store(Request $request): RedirectResponse
+      public function store(TaskRequest $request): RedirectResponse
     {
-        $validated = $request->validate($this->rules, $this->messages);
-
         Task::create([
-            'name'   => $validated['name'],
+            'name'   => $request->validated('name'),
             'status' => false,
         ]);
 
-         return redirect()
-        ->route('tasks.index')
-        ->with('message', 'タスクを追加しました。');
-
+        return redirect()
+            ->route('tasks.index')
+            ->with('message', 'タスクを追加しました。');
     }
 
     /**
@@ -84,10 +76,8 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function edit($id): View
+    public function edit(Task $task): View
     {
-         $task = Task::findOrFail($id);
-
         return view('tasks.edit', compact('task'));//
     }
 
@@ -98,16 +88,14 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id): RedirectResponse
+    public function update(TaskRequest $request, Task $task): RedirectResponse
     {
-         $validated = $request->validate($this->rules, $this->messages);
-        $task = Task::findOrFail($id);
-        $task->name = $validated['name'];
+        $task->name = $request->validated('name');
         $task->save();
 
-         return redirect()
-        ->route('tasks.index')
-        ->with('message', 'タスクを更新しました。');
+        return redirect()
+            ->route('tasks.index')
+            ->with('message', 'タスクを更新しました。');
     }
 
     /**
@@ -116,9 +104,8 @@ class TaskController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function destroy($id): RedirectResponse
+    public function destroy(Task $task): RedirectResponse
     {
-        $task = Task::findOrFail($id);
         $task->delete();
 
         return redirect()
@@ -126,21 +113,19 @@ class TaskController extends Controller
         ->with('message2', 'タスクを削除しました。');
     }
 
-    public function complete($id): RedirectResponse
+    public function complete(Task $task): RedirectResponse
     {
-        $task = Task::find($id);
         $task->status = true;
         $task->save();
 
        return redirect()
-        ->route('tasks.index')
+        ->route('tasks.index','')
         ->with('message', 'タスクを完了にしました。');
 
     }
 
-public function undo($id)
+public function undo(Task $task)
     {
-        $task = Task::findOrFail($id);
         $task->status = false;
         $task->save();
 
