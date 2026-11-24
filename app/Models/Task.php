@@ -34,6 +34,7 @@ class Task extends Model
     protected $fillable = [
         'name',
         'status',
+        'due_date',
     ];
 
     /**
@@ -43,5 +44,6 @@ class Task extends Model
      */
     protected $casts = [
         'status' => 'boolean',
+        'due_date',
     ];
 }

@@ -25,6 +25,7 @@ class TaskRequest extends FormRequest
     {
         return [
             'name' => 'required|max:100',
+            'due_date' => 'nullable|date',
         ];
     }
 

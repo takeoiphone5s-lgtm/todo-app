@@ -20,5 +20,5 @@ Route::patch('/tasks/{task}/complete', [TaskController::class, 'complete'])
 Route::patch('/tasks/{task}/undo', [TaskController::class, 'undo'])->name('tasks.undo');
 
 Route::resource('tasks', TaskController::class)
-    ->only(['index','store','edit', 'update','destroy']);
+    ->only(['index','store','edit', 'update','destroy','up','down']);
 

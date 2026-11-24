@@ -45,6 +45,8 @@
                     <td class="muted">{{ $task->created_at->format('Y/m/d H:i') }}</td>
                     <td class="actions">
                         
+                        <input type="date" name="due_date">
+
                         <form action="{{ route('tasks.complete', $task->id) }}" method="post">
                             @csrf
                             @method('PATCH')

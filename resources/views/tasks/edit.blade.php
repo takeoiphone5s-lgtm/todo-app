@@ -11,6 +11,9 @@
             @csrf
             @method('PUT')
 
+            <input type="date" name="due_date">
+            
+
             <input type="text" name="name" value="{{ old('name', $task->name) }}">
             @error('name')
                 <p class="error">{{ $message }}</p>
